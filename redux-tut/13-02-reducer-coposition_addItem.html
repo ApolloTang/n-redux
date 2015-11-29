@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>redux</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- <link rel="stylesheet" href="http://localhost:8001/css/lib/normalize&#45;2.1.2.css"> -->
+    <style media="screen" type="text/css">
+    </style>
+</head>
+
+<body>
+
+<div id='root'></div>
+
+<script src="http://localhost:8001/js/lib/lodash-v2.4.1.js"></script>
+<script src="http://localhost:8001/js/lib/babel-core--browser.js"></script>
+<script src="http://localhost:8001/js/lib/redux.js"></script>
+<script src="http://localhost:8001/js/lib/React.js"></script>
+<script src="http://localhost:8001/js/lib/ReactDOM.js"></script>
+<script src="http://localhost:8001/js/lib/expect.js"></script>
+<script src="http://localhost:8001/js/lib/deep-freeze.js"></script>
+<script type="text/babel">
+
+const state_collection = [ { id: 0, isTrue: true }, { id: 1, isTrue: true } ];
+deepFreeze(state_collection);
+
+const rdx_item = ( state={}, action ) => {
+    switch (action.type) {
+        case 'toggleProperty_isTrue':
+            if (state.id !== action.id) {
+                return state;
+            } else {
+                return { ...state, isTrue:!state.isTrue };
+            }
+            break;
+        case 'addItem':
+            return { id: action.id, isTrue: true}
+            break;
+        default:
+            return state;
+    }
+};
+
+const rdx_collection = ( state=[], action ) => {
+    switch (action.type){
+        case 'toggleProperty_isTrue' :
+            return state.map( stateItem => rdx_item(stateItem, action) );
+            break;
+        case 'addItem' :
+            const newItem = rdx_item( state, action );
+            return [...state, newItem ]
+            break;
+        default :
+            return state;
+    }
+};
+
+const action_toggleIsTrue = { type:'toggleProperty_isTrue', id:1}
+deepFreeze(action_toggleIsTrue);
+
+let state_collection_reduced, state_collection_reduced_expected;
+
+state_collection_reduced = rdx_collection(state_collection, action_toggleIsTrue);
+state_collection_reduced_expected = [ { id: 0, isTrue: true }, { id: 1, isTrue: false } ];
+console.log(state_collection[1].isTrue, state_collection_reduced[1].isTrue)
+expect( state_collection_reduced ).toEqual( state_collection_reduced_expected);
+
+const state_collection_previous = state_collection_reduced;
+const newId = 'new_'+_.uniqueId();
+const action_addNewItem = { type:'addItem', id:newId}
+
+state_collection_reduced = rdx_collection(state_collection_previous, action_addNewItem);
+state_collection_reduced_expected = [ { id: 0, isTrue: true }, { id: 1, isTrue: false },  { id: newId, isTrue: true }];
+console.log(`${JSON.stringify(state_collection)}\n${JSON.stringify( state_collection_previous )}\n${ JSON.stringify( state_collection_reduced)}`);
+expect( state_collection_reduced ).toEqual( state_collection_reduced_expected);
+
+</script>
+</body>
+
+</html>

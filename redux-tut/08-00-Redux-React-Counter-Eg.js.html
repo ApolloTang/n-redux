@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>redux</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- <link rel="stylesheet" href="http://localhost:8001/css/lib/normalize&#45;2.1.2.css"> -->
+    <style media="screen" type="text/css">
+    </style>
+</head>
+
+<body>
+
+<div id='root'></div>
+
+<script src="http://localhost:8001/js/lib/lodash-v2.4.1.js"></script>
+<script src="http://localhost:8001/js/lib/babel-core--browser.js"></script>
+<script src="http://localhost:8001/js/lib/redux.js"></script>
+<script src="http://localhost:8001/js/lib/React.js"></script>
+<script src="http://localhost:8001/js/lib/ReactDOM.js"></script>
+<script type="text/babel">
+
+const counter = ( state=0, action ) => {
+    switch (action.type) {
+        case 'INCREMENT':
+            return state +1;
+        case 'DECREMENT':
+            return state -1;
+        default:
+            return state;
+    }
+};
+
+const { createStore } = Redux;
+const store = createStore(counter);
+
+
+const Counter = ({ value }) => {
+
+    const onIncrement = () => {
+        console.log('dispatcing INCREMENT');
+        store.dispatch({type:'INCREMENT'});
+    }
+
+    const onDecrement = () => {
+        console.log('dispatcing DECREMENT');
+        store.dispatch({type:'DECREMENT'});
+    }
+    return (
+        <div>
+            <h1>{value}</h1>
+            <button onClick={onIncrement}>+</button>
+            <button onClick={onDecrement}>-</button>
+        </div>
+    );
+}
+
+
+const render =() => {
+    ReactDOM.render(
+        <Counter value={store.getState()} />,
+        document.getElementById('root')
+    );
+}
+
+store.subscribe(render);
+render();
+
+</script>
+</body>
+
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>redux</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- <link rel="stylesheet" href="http://localhost:8001/css/lib/normalize&#45;2.1.2.css"> -->
+    <style media="screen" type="text/css">
+    </style>
+</head>
+
+<body>
+
+<div id='root'></div>
+
+<script src="http://localhost:8001/js/lib/lodash-v2.4.1.js"></script>
+<script src="http://localhost:8001/js/lib/babel-core--browser.js"></script>
+<script src="http://localhost:8001/js/lib/redux.js"></script>
+<script src="http://localhost:8001/js/lib/React.js"></script>
+<script src="http://localhost:8001/js/lib/ReactDOM.js"></script>
+<script src="http://localhost:8001/js/lib/expect.js"></script>
+<script src="http://localhost:8001/js/lib/deep-freeze.js"></script>
+<script type="text/babel">
+
+const o1 = { a:'a', b:'b'};
+const setProperty_es6 = ( obj, key, value ) => {
+    const _o = {}; _o[key]=value;
+    return Object.assign( {}, obj, _o );
+};
+console.log(o1, setProperty_es6(o1, 'b', {x:'x', y:'y'}));
+
+
+const o2 = { a:'a', b:'b'};
+const setProperty_es7 = ( obj, key, value ) => {
+    const _o = {}; _o[key]=value;
+    return { ...obj, _o }
+};
+
+console.log(o2, setProperty_es6(o2, 'b', {x:'x', y:'y'}));
+
+
+</script>
+</body>
+
+</html>

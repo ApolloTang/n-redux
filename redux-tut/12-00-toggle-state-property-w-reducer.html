@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>redux</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- <link rel="stylesheet" href="http://localhost:8001/css/lib/normalize&#45;2.1.2.css"> -->
+    <style media="screen" type="text/css">
+    </style>
+</head>
+
+<body>
+
+<div id='root'></div>
+
+<script src="http://localhost:8001/js/lib/lodash-v2.4.1.js"></script>
+<script src="http://localhost:8001/js/lib/babel-core--browser.js"></script>
+<script src="http://localhost:8001/js/lib/redux.js"></script>
+<script src="http://localhost:8001/js/lib/React.js"></script>
+<script src="http://localhost:8001/js/lib/ReactDOM.js"></script>
+<script src="http://localhost:8001/js/lib/expect.js"></script>
+<script src="http://localhost:8001/js/lib/deep-freeze.js"></script>
+<script type="text/babel">
+
+const myState = [ { id: 0, isTrue: true }, { id: 1, isTrue: true } ];
+deepFreeze(myState);
+
+const myReducer = ( state=[], action ) => {
+    switch (action.type){
+        case 'toggleProperty_isTrue' :
+
+            return state.map( stateItem => {
+                if (stateItem.id !== action.id) {
+                    return stateItem;
+                } else {
+                    return { ...stateItem, isTrue:!stateItem.isTrue };
+                    // return Object.assign({}, stateItem, {isTrue:!stateItem.isTrue})
+                }
+            });
+
+            break;
+        default :
+            return state;
+    }
+};
+
+const myAction = { type:'toggleProperty_isTrue', id:1}
+deepFreeze(myAction);
+
+let myState_reduced = myReducer(myState, myAction);
+let myState_reduced_expected = [ { id: 0, isTrue: true }, { id: 1, isTrue: false } ];
+
+expect( myState_reduced ).toEqual( myState_reduced_expected);
+
+console.log(myState[1].isTrue, myState_reduced[1].isTrue)
+
+</script>
+</body>
+
+</html>

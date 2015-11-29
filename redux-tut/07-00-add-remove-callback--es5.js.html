@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>redux</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- <link rel="stylesheet" href="http://localhost:8001/css/lib/normalize&#45;2.1.2.css"> -->
+    <style media="screen" type="text/css">
+    </style>
+</head>
+
+<body>
+
+<div id='root'></div>
+
+<script src="http://localhost:8001/js/lib/lodash-v2.4.1.js"></script>
+<script src="http://localhost:8001/js/lib/babel-core--browser.js"></script>
+<script src="http://localhost:8001/js/lib/redux.js"></script>
+<script src="http://localhost:8001/js/lib/React.js"></script>
+<script src="http://localhost:8001/js/lib/ReactDOM.js"></script>
+<script src="http://localhost:8001/js/lib/expect.js"></script>
+<script src="http://localhost:8001/js/lib/deep-freeze.js"></script>
+<script type="text/babel">
+
+var callbacks = [];
+var addCallback = function(newCallback) {
+    callbacks.push(newCallback)
+    return function() {
+        callbacks = callbacks.filter( function(cb){
+            return (cb !== newCallback);
+        });
+    };
+};
+
+var callback_1_remove = addCallback(function() {console.log(1)});
+var callback_2_remove = addCallback(function() {console.log(2)});
+var callback_3_remove = addCallback(function() {console.log(3)});
+
+callbacks.forEach( function(cb) { cb(); })
+
+
+callback_2_remove();
+callbacks.forEach( function(cb) { cb(); })
+
+</script>
+</body>
+
+</html>

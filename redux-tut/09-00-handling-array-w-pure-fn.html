@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>redux</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- <link rel="stylesheet" href="http://localhost:8001/css/lib/normalize&#45;2.1.2.css"> -->
+    <style media="screen" type="text/css">
+    </style>
+</head>
+
+<body>
+
+<div id='root'></div>
+
+<script src="http://localhost:8001/js/lib/lodash-v2.4.1.js"></script>
+<script src="http://localhost:8001/js/lib/babel-core--browser.js"></script>
+<script src="http://localhost:8001/js/lib/redux.js"></script>
+<script src="http://localhost:8001/js/lib/React.js"></script>
+<script src="http://localhost:8001/js/lib/ReactDOM.js"></script>
+<script src="http://localhost:8001/js/lib/expect.js"></script>
+<script src="http://localhost:8001/js/lib/deep-freeze.js"></script>
+<script type="text/babel">
+
+//////////////////////
+// Revmove by Index //
+//////////////////////
+const a1 = [0,1,2,3,4,5,6,7]
+const removeItemByIndex_pure_es5 = function(collection, index ) {
+    return collection.slice(0,index).concat(collection.slice(index+1)); };
+console.log(a1, removeItemByIndex_pure_es5(a1, 4));
+
+
+const a2 = [0,1,2,3,4,5,6,7]
+const removeItemByIndex_pure_es6 = ( collection, index ) => [
+    ...collection.slice(0,index), ...collection.slice(index+1) ];
+console.log(a2, removeItemByIndex_pure_es6(a2, 4));
+
+
+
+
+/////////////
+// Add new //
+/////////////
+const b1 = [0,1,2,3];
+const pushItem_pure_es6 = ( collection, item ) => [ ...collection, item ];
+console.log(b1, pushItem_pure_es6(b1, 'new'))
+
+
+const b2 = [0,1,2,3];
+const pushItem_pure_es5 = function( collection, item ) {
+    return [].slice.call(collection).concat([item]); };
+console.log(b2, pushItem_pure_es6(b2, 'new'))
+
+
+
+////////////////////////
+// Set value by index //
+////////////////////////
+const c1 = [0,1,2,3,4,5];
+const setItemByIndex_pure_es5 = function( collection, index, value ) {
+    return collection
+        .slice(0,index)
+        .concat([value])
+        .concat( collection.slice(index+1) );
+};
+console.log(c1, setItemByIndex_pure_es5(c1, 3, 'x'));
+
+
+const c2 = [0,1,2,3,4,5];
+const setItemByIndex_pure_es6 = ( collection, index, value ) => [
+    ...collection.slice(0, index),
+    value,
+    ...collection.slice( index+1 )
+]
+console.log(c1, setItemByIndex_pure_es6(c2, 3, 'x'));
+
+</script>
+</body>
+
+</html>
