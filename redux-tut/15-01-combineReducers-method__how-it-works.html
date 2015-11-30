@@ -77,10 +77,16 @@ const combineReducers = (reducers, action) => {
         const merged = Object.keys(reducers).reduce(   /// !!!! <-- the crux of redux is here
             ( incrementalObj, key ) => {
                 incrementalObj[key] = reducers[key](state[key], action);
-                                      //       ^-----------^------ key is the braching
-                                      //       point in your state tree, be sure that you
-                                      //       assign the corresponding reducer
-                                      //       to the coreesponding keyname [! very importnat]
+                                      //        ^--[1]     ^--[2]
+                                      //
+                                      // Here you are invoking the reducer with its corressponding
+                                      // slice of state, so key[2] point to the branch/slice of state tree
+                                      // to be processd by reducers pointed to by key[1].
+                                      //
+                                      // Be sure that you are keeping track of these key labeling.
+                                      // To simplify keeping track of keynames, name the keyname of
+                                      // reducer (key[1]) same as the keyname for the branch/sclice of
+                                      // state tree (key[2]). [!!! very important]
                 return incrementalObj;
             }
         , {});
