@@ -72,7 +72,7 @@ const rdx_visibilityFilter = ( state='showAll', action ) => {
 
 // const {combineReducers} = Redux;  //<--- comment this out and write our
                                      //     own below to see how it works
-const combineReducers = (reducers, action) => {
+const combineReducers = (reducers) => {
     function superReducer( state={}, action ) {
         const merged = Object.keys(reducers).reduce(   /// !!!! <-- the crux of redux is here
             ( incrementalObj, key ) => {
@@ -103,7 +103,7 @@ const combineReducers = (reducers, action) => {
 const rdx_app = combineReducers({
     collection      : rdx_collection,
     visibilityFilter: rdx_visibilityFilter
-} /*, action*/ );
+});
 
 
 // ### rdx_app is the app level reducer, it is the root reducer.
