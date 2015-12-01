@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>redux</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- <link rel="stylesheet" href="http://localhost:8001/css/lib/normalize&#45;2.1.2.css"> -->
+    <style media="screen" type="text/css">
+    </style>
+</head>
+
+<body>
+
+<div id='root'></div>
+
+<script src="http://localhost:8001/js/lib/lodash-v2.4.1.js"></script>
+<script src="http://localhost:8001/js/lib/babel-core--browser.js"></script>
+<script src="http://localhost:8001/js/lib/redux.js"></script>
+<script src="http://localhost:8001/js/lib/React.js"></script>
+<script src="http://localhost:8001/js/lib/ReactDOM.js"></script>
+<script src="http://localhost:8001/js/lib/expect.js"></script>
+<script src="http://localhost:8001/js/lib/deep-freeze.js"></script>
+<script type="text/babel">
+
+
+const rdx_item = ( state={}, action ) => {
+    switch (action.type) {
+        case 'toggleProperty_isTrue':
+            if (state.id !== action.id) {
+                return state;
+            } else {
+                return { ...state, isTrue:!state.isTrue };
+            }
+            break;
+        case 'addItem':
+            return { id: action.id, text:action.text, isTrue: false}
+            break;
+        default:
+            return state;
+    }
+};
+
+const rdx_collection = ( state=[], action ) => {
+    switch (action.type){
+        case 'toggleProperty_isTrue' :
+            return state.map( stateItem => rdx_item(stateItem, action) );
+            break;
+        case 'addItem' :
+            const newItem = rdx_item( state, action );
+            return [...state, newItem ]
+            break;
+        default :
+            return state;
+    }
+};
+
+const rdx_visibilityFilter = ( state='showAll', action ) => {
+    switch (action.type) {
+        case 'setFilter':
+            return action.filterSetting;
+        default:
+            return state;
+    }
+}
+
+
+const {combineReducers} = Redux;
+const rdx_app = combineReducers({
+    collection      : rdx_collection,
+    visibilityFilter: rdx_visibilityFilter
+});
+
+
+const {createStore} = Redux;
+const store = createStore(rdx_app);
+
+
+let itemId = 0;
+
+const {Component} = React;
+
+class MyApp extends Component {
+    onAddItem() {
+        const action = { type: 'addItem', text: this.input.value, id: itemId++ };
+        store.dispatch(action);
+        this.input.value = ''; // clear previous text in input form
+    }
+
+    onItemClick(id) {
+        const action = { type: 'toggleProperty_isTrue', id };
+        store.dispatch(action);
+    }
+
+    render() {
+        const collection = this.props.collection;
+        return(
+            <div>
+                <input ref={node=>{ this.input = node}} />
+                <button onClick={this.onAddItem.bind(this)} >add item</button>
+                <ul>
+                    {collection.map( item =>
+                        <li key={item.id}
+                            onClick={ (e)=>this.onItemClick(item.id) }
+                            style={{ textDecoration: item.isTrue ? 'line-through' : 'none'}}
+                        >{item.text}</li>)
+                    }
+                </ul>
+            </div>
+        )
+    }
+}
+
+const render = () => {
+    ReactDOM.render(
+        <MyApp collection={store.getState().collection}/>,
+        document.getElementById('root')
+    );
+};
+
+store.subscribe(render);
+render();
+
+</script>
+</body>
+
+</html>
