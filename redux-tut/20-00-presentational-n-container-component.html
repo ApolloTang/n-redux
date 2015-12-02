@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>redux</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- <link rel="stylesheet" href="http://localhost:8001/css/lib/normalize&#45;2.1.2.css"> -->
+    <style media="screen" type="text/css">
+    </style>
+</head>
+
+<body>
+
+<div id='root'></div>
+
+<script src="http://localhost:8001/js/lib/lodash-v2.4.1.js"></script>
+<script src="http://localhost:8001/js/lib/babel-core--browser.js"></script>
+<script src="http://localhost:8001/js/lib/redux.js"></script>
+<script src="http://localhost:8001/js/lib/React.js"></script>
+<script src="http://localhost:8001/js/lib/ReactDOM.js"></script>
+<script src="http://localhost:8001/js/lib/expect.js"></script>
+<script src="http://localhost:8001/js/lib/deep-freeze.js"></script>
+<script type="text/babel">
+
+
+/////////////
+// reducer //
+/////////////
+const rdx_item = ( state={}, action ) => {
+    switch (action.type) {
+        case 'toggleProperty_isTrue':
+            if (state.id !== action.id) {
+                return state;
+            } else {
+                return { ...state, isTrue:!state.isTrue };
+            }
+            break;
+        case 'addItem':
+            return { id: action.id, text:action.text, isTrue: false}
+            break;
+        default:
+            return state;
+    }
+};
+
+const rdx_collection = ( state=[], action ) => {
+    switch (action.type){
+        case 'toggleProperty_isTrue' :
+            return state.map( stateItem => rdx_item(stateItem, action) );
+            break;
+        case 'addItem' :
+            const newItem = rdx_item( state, action );
+            return [...state, newItem ]
+            break;
+        default :
+            return state;
+    }
+};
+
+const rdx_visibilityFilter = ( state='showAll', action ) => {
+    switch (action.type) {
+        case 'setFilter':
+            return action.visibilityFilter;
+        default:
+            return state;
+    }
+}
+
+const {combineReducers} = Redux;
+const rdx_app = combineReducers({
+    collection      : rdx_collection,
+    visibilityFilter: rdx_visibilityFilter
+});
+
+const {createStore} = Redux;
+const store = createStore(rdx_app);
+
+
+
+
+/////////////////////////////
+// presentation components //
+/////////////////////////////
+const FilterVisibilityControl = ({visibilityFilter, children, activeFilter, handleClick}) => {
+    const onClickHandle = (e) => {
+        e.preventDefault();
+        handleClick(visibilityFilter);
+    }
+
+    if (visibilityFilter === activeFilter) {
+        return <span>{children}</span>;
+    } else {
+        return <a href="#" onClick={ onClickHandle }>{children}</a>;
+    }
+};
+
+const Item = ({isTrue, text, onItemClick}) => {
+   return <li onClick={onItemClick} style={{ textDecoration: isTrue ? 'line-through' : 'none'}} >{text} </li>
+};
+
+const Collection = ({ filteredCollection, onItemClick }) => {
+    return (<ul>{ filteredCollection.map(
+        item => <Item key={item.id} {...item} onItemClick={ ()=>onItemClick(item.id) } />
+    ) }</ul>);
+};
+
+
+
+/////////////////////////
+// container component //
+/////////////////////////
+let itemId = 0;
+const {Component} = React;
+class MyApp extends Component {
+    onVisibilityFilterChange(visibilityFilter) {
+        const action = {type:'setFilter', visibilityFilter}
+        store.dispatch(action);
+    }
+
+    onItemClick(id) {
+        const action = { type: 'toggleProperty_isTrue', id };
+        store.dispatch(action);
+    }
+
+    onAddItem() {
+        const action = { type: 'addItem', text: this.input.value, id: itemId++ };
+        store.dispatch(action);
+        this.input.value = ''; // clear previous text in input form
+    }
+
+    render() {
+        const { collection, visibilityFilter} = this.props;
+        const filteredCollection = getFilteredCollection(collection, visibilityFilter);
+        return (
+            <div>
+                <input ref={node=>{ this.input = node}} />
+                <button onClick={this.onAddItem.bind(this)} >add item</button>
+                <Collection filteredCollection={filteredCollection} onItemClick={ this.onItemClick } ></Collection>
+                <p>Show:
+                    &nbsp;<FilterVisibilityControl visibilityFilter="showAll"   activeFilter={ visibilityFilter } handleClick={this.onVisibilityFilterChange} >All</FilterVisibilityControl>
+                    &nbsp;<FilterVisibilityControl visibilityFilter="showTrue"  activeFilter={ visibilityFilter } handleClick={this.onVisibilityFilterChange} >True</FilterVisibilityControl>
+                    &nbsp;<FilterVisibilityControl visibilityFilter="showFalse" activeFilter={ visibilityFilter } handleClick={this.onVisibilityFilterChange} >False</FilterVisibilityControl>
+                </p>
+            </div>
+        )
+    }
+}
+
+
+
+////////////
+// helper //
+////////////
+function getFilteredCollection(collection, visibilityFilter) {
+    switch (visibilityFilter) {
+        case 'showAll':
+            return collection;
+        case 'showTrue':
+            return collection.filter(i=>i.isTrue);
+        case 'showFalse' :
+            return collection.filter(i=>!i.isTrue);
+    };
+};
+
+const render = () => {
+    console.log(store.getState())
+    ReactDOM.render(
+        <MyApp {...store.getState()} />,
+        document.getElementById('root')
+    );
+};
+
+store.subscribe(render);
+render();
+
+</script>
+</body>
+
+</html>
