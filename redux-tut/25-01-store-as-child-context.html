@@ -107,6 +107,7 @@ const AnchorLinkComponent = ( {isActive, onClickHandler, href, children} ) => {
 ////////////
 let itemId = 0;
 const AddItemWidget = (props, context) => {
+                             //^^^^^^^-------- REACT PASSED IN CONTEXT IN 2ND PARAMETER
     let input;
 
     const {store} = context;
@@ -141,7 +142,6 @@ const {Component} = React;
 class VisibilityControlItem_middleContainer extends Component {
     componentDidMount() {
         const { store } = this.context;
-        // WILL UPDATE EVEN IF PARENT DID NOT UPDATE
         this.unsubScribeStore = store.subscribe(()=>{this.forceUpdate();});
     }
 
