@@ -229,12 +229,18 @@ const MyApp = () => {
 }
 
 //-- Context --//
+// Element can specify a context thatapplies to all of its children
+// and grandchildren. Thisis done through the childContextTypes
+// and getChildContext properties.
 // Ref:
-// https://www.tildedave.com/2014/11/15/introduction-to-contexts-in-react-js.html
+//      https://www.tildedave.com/2014/11/15/introduction-to-contexts-in-react-js.html
+
 class Provider extends Component {
     getChildContext() {
         return {
-            store: this.props.store
+            store: this.props.store  // <--- elements must whitelist
+                                     // the context elements they have
+                                     // access to through contextTypes
         };
     }
 
@@ -250,6 +256,7 @@ Provider.childContextTypes = {
 const {createStore} = Redux;
 ReactDOM.render(
     <Provider store={createStore(rdx_app)}>
+           {/*^^-- store is now available to MyApp, and its grand children */}
         <MyApp />
     </Provider>
     , document.getElementById('root')
