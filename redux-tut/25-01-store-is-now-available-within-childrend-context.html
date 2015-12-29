@@ -108,6 +108,8 @@ const AnchorLinkComponent = ( {isActive, onClickHandler, href, children} ) => {
 let itemId = 0;
 const AddItemWidget = (props, context) => {
                              //^^^^^^^-------- REACT PASSED IN CONTEXT IN 2ND PARAMETER
+                             // unlike middle container which is inherited from Component (to have method like componentDidMount etc
+                             // widget is just a javascript function, so react passed in the context in the formal arguments
     let input;
 
     const {store} = context;
