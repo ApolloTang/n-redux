@@ -208,8 +208,26 @@ VisibilityControlItem_middleContainer.contextTypes = {
 // }
 
 
+// [EXPLAINATION]
+// The above is abstract out into "Connect"
+// where mapAppState_to_Props() select the part of store required as the props for Collection_middleContainer
+// similarily mapDispatchCallBack_to_Props collect the dispatch callback used by Collection_middleContainer
+//
+//   store(reducer)
+//        |
+//   [ PROVIDER ]
+//        |
+//        v                               presentation component
+//   ( appState, dispatchCallBack ) ------> Collection(props) ┐            container
+//                                     ^                      | ==> Collection_middleContainer
+//                                [ CONNECT ]                 ┘
+//
+
+//=============================================
 // ( appState, dispatchCallBack ) -->  props //
-    const mapAppState_to_Props = (appState) => {
+//=============================================
+
+    const mapAppState_to_props = (appState) => {
         const { collection, visibilityFilter } = appState;
         const props = {
             filteredCollection: getFilteredCollection(collection, visibilityFilter), // <-- DEFIDED IN HELPER SECTION
@@ -217,7 +235,7 @@ VisibilityControlItem_middleContainer.contextTypes = {
         return props;
     };
 
-    const mapDispatchCallBack_to_Props = (storeDispatch) => {
+    const mapDispatchCallBack_to_props = (storeDispatch) => {
         const onPropertyToggled_fn = (id) => {
             const action = { type: 'toggleProperty_isTrue', id };
             storeDispatch(action);
@@ -229,22 +247,13 @@ VisibilityControlItem_middleContainer.contextTypes = {
         return props;
     };
 
+
 const {connect} = ReactRedux;
 // import {connect} from 'react-redux';
 
 const Collection_middleContainer
-    = connect( mapAppState_to_Props, mapDispatchCallBack_to_Props )(Collection);
+    = connect( mapAppState_to_props, mapDispatchCallBack_to_props )(Collection);
 
-//
-//   store(reducer)
-//        |
-//   [ PROVIDER ]
-//        |
-//        v                               presentation component
-//   ( appState, dispatchCallBack ) ------> Collection(props) ┐            container
-//                                     ^                      | ==> Collection_middleContainer
-//                                [ CONNECT ]                 ┘
-//
 
 /////////////////
 // Application //
