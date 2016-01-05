@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>redux</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- <link rel="stylesheet" href="http://localhost:8001/css/lib/normalize&#45;2.1.2.css"> -->
+    <style media="screen" type="text/css">
+    </style>
+</head>
+
+<body>
+
+<div id='root'></div>
+
+<script src="http://localhost:8001/js/lib/lodash-v2.4.1.js"></script>
+<script src="http://localhost:8001/js/lib/babel-core--browser.js"></script>
+<script src="http://localhost:8001/js/lib/redux.js"></script>
+<script src="http://localhost:8001/js/lib/React.js"></script>
+<script src="http://localhost:8001/js/lib/ReactDOM.js"></script>
+<script src="http://localhost:8001/js/lib/expect.js"></script>
+<script src="http://localhost:8001/js/lib/deep-freeze.js"></script>
+<script src="http://localhost:8001/js/lib/react-redux-v4.0.1.js"></script>
+<script type="text/babel">
+
+/////////////
+// reducer //
+/////////////
+
+const rdx_item = ( state={}, action ) => {
+    switch (action.type) {
+        case 'toggleProperty_isTrue':
+            if (state.id !== action.id) {
+                return state;
+            } else {
+                return { ...state, isTrue:!state.isTrue };
+            }
+            break;
+        case 'addItem':
+            return { id: action.id, text:action.text, isTrue: false}
+            break;
+        default:
+            return state;
+    }
+};
+
+const rdx_collection = ( state=[], action ) => {
+    switch (action.type){
+        case 'toggleProperty_isTrue' :
+            return state.map( stateItem => rdx_item(stateItem, action) );
+            break;
+        case 'addItem' :
+            const newItem = rdx_item( state, action );
+            return [...state, newItem ]
+            break;
+        default :
+            return state;
+    }
+};
+
+const rdx_visibilityFilter = ( state='showAll', action ) => {
+    switch (action.type) {
+        case 'setFilter':
+            return action.visibilityFilter;
+        default:
+            return state;
+    }
+}
+
+const {combineReducers} = Redux;
+const rdx_app = combineReducers({
+    collection      : rdx_collection,
+    visibilityFilter: rdx_visibilityFilter
+});
+
+
+
+
+/////////////////////////////
+// presentation components //
+/////////////////////////////
+
+const Item = ({isTrue, text, onItemClick}) => {
+   return <li onClick={onItemClick} style={{ textDecoration: isTrue ? 'line-through' : 'none'}} >{text} </li>
+};
+
+const Collection = (props) => {
+    const { filteredCollection, onItemClick } = props
+    return (<ul>{ filteredCollection.map(
+        item => <Item key={item.id} {...item} onItemClick={ ()=>onItemClick(item.id) } />
+    ) }</ul>);
+};
+
+const AnchorLinkComponent = (props) => {
+    const {isActive, onClickHandler, children} = props
+    // isActvie is from mapAppState2props_VisibilityControlItem_middleContainer
+    // onClickHandler, children is from:
+    //      <VisibilityControlItem_middleContainer visibilityFilter="showAll"   >All  </VisibilityControlItem_middleContainer>
+    console.log('props: ', props);
+    if (isActive ) {
+        return <span>{children}</span>;
+    } else {
+        return <a href='#' onClick={onClickHandler}>{children}</a>;
+    }
+}
+
+
+
+const {connect} = ReactRedux;
+
+////////////
+// Widget //
+////////////
+
+
+let itemId = 0;
+const AddItemWidget = (props) => {
+    let input;
+    const { dispatch } = props;
+    // const { storeDispatch } = props;
+    const addItem = (text) => {
+        const action = { type: 'addItem', text, id: itemId++ };
+        dispatch(action);
+    };
+    const onButtonClick = (e) => {
+       addItem(input.value);
+       input.value = '';
+    }
+    return(
+        <div>
+            <input ref={node=>{input = node}} />
+            <button onClick={onButtonClick} >add item</button>
+        </div>
+    )
+}
+
+
+// const mapAppState_to_addItemWidgetProps = (appState) => {
+//     const props = { };
+//     return props;
+// };
+// const mapDispatchCallBack_to_addItemWidgetProps = (storeDispatch) => {
+//     // const addItem = (text) => {
+//     //     const action = { type: 'addItem', text, id: itemId++ };
+//     //     storeDispatch(action);
+//     // };
+//     // const props = { addItem: addItem };
+//     const props = {storeDispatch}
+//     return props;
+// }
+const AddItemWidget_connected
+    = connect (/* mapAppState_to_addItemWidgetProps, mapDispatchCallBack_to_addItemWidgetProps*/ )(AddItemWidget);
+
+
+
+
+
+
+//////////////////////
+// middle container //
+//////////////////////
+const {Component} = React;
+
+// class VisibilityControlItem_middleContainer extends Component {
+//     componentDidMount() {
+//         const { store } = this.context;
+//         this.unsubScribeStore = store.subscribe(()=>{this.forceUpdate();});
+//     }
+//
+//     componentWillUnmount() {
+//         this.unsubScribeStore();
+//     }
+//
+//     render() {
+//         const {visibilityFilter, children} = this.props;
+//
+//         const { store } = this.context;
+//         const appState = store.getState();
+//
+//         const onClickHandler = (e) => {
+//             e.preventDefault();
+//             const action = {type:'setFilter', visibilityFilter}
+//             store.dispatch(action);
+//         }
+//
+//         return <AnchorLinkComponent
+//             isActive={visibilityFilter === appState.visibilityFilter}
+//             onClickHandler={ onClickHandler }
+//             children={children}
+//         />
+//     }
+// };
+// VisibilityControlItem_middleContainer.contextTypes = {
+//     store: React.PropTypes.object
+// }
+
+
+const mapAppState2props_VisibilityControlItem_middleContainer = (appState, ownProps) => {
+    console.log('appState: ', appState);
+    console.log('ownProps: ',  ownProps); // Object {visibilityFilter: "showAll", children: "All  "}
+                                          // ownProps is the properties of passed in to <VisibilityControlItem_middleContainer />
+    const props = {
+        isActive: appState.visibilityFilter === ownProps.visibilityFilter
+    };
+    return props;
+};
+const mapDispatchCb2props_VisibilityControlItem_middleContainer = (storeDispatch, ownProps) => {
+    const onClickHandler = (e) => {
+        e.preventDefault();
+        const action = { type:'setFilter', visibilityFilter: ownProps.visibilityFilter };
+        storeDispatch(action);
+    }
+    const props = { onClickHandler};
+    return props;
+};
+const VisibilityControlItem_middleContainer
+    = connect(
+        mapAppState2props_VisibilityControlItem_middleContainer,
+        mapDispatchCb2props_VisibilityControlItem_middleContainer
+    )(AnchorLinkComponent);
+
+
+// [EXPLAINATION]
+// The above is abstract out into "Connect"
+// where mapAppState_to_Props() select the part of store required as the props for Collection_middleContainer
+// similarily mapDispatchCallBack_to_Props collect the dispatch callback used by Collection_middleContainer
+//
+//   store(reducer)
+//        |
+//   [ PROVIDER ]
+//        |
+//        v                               presentation component
+//   ( appState, dispatchCallBack ) ------> Collection(props) ┐            container
+//                                     ^                      | ==> Collection_middleContainer
+//                                [ CONNECT ]                 ┘
+//
+
+//=============================================
+// ( appState, dispatchCallBack ) -->  props //
+//=============================================
+
+const mapAppState_to_collectionProps = (appState) => {
+    const { collection, visibilityFilter } = appState;
+    const props = {
+        filteredCollection: getFilteredCollection(collection, visibilityFilter), // <-- DEFIDED IN HELPER SECTION
+    };
+    return props;
+};
+
+const mapDispatchCallBack_to_collectionProps = (storeDispatch) => {
+    const onPropertyToggled_fn = (id) => {
+        const action = { type: 'toggleProperty_isTrue', id };
+        storeDispatch(action);
+    };
+
+    const props = {
+         onItemClick: onPropertyToggled_fn
+    };
+    return props;
+};
+
+
+const Collection_middleContainer
+    = connect( mapAppState_to_collectionProps, mapDispatchCallBack_to_collectionProps )(Collection);
+
+
+/////////////////
+// Application //
+/////////////////
+
+const VisibilityControl = () =>{
+    return(
+        <p>Show:
+            &nbsp;<VisibilityControlItem_middleContainer visibilityFilter="showAll"   >All  </VisibilityControlItem_middleContainer>
+            &nbsp;<VisibilityControlItem_middleContainer visibilityFilter="showTrue"  >True </VisibilityControlItem_middleContainer>
+            &nbsp;<VisibilityControlItem_middleContainer visibilityFilter="showFalse" >False</VisibilityControlItem_middleContainer>
+        </p>
+    );
+}
+
+const MyApp = () => {
+    return(
+        <div id="myApp">
+            <AddItemWidget_connected    />
+            <Collection_middleContainer />
+            <VisibilityControl          />
+        </div>
+    );
+}
+
+
+const {Provider} = ReactRedux;
+const {createStore} = Redux;
+ReactDOM.render(
+    <Provider store={createStore(rdx_app)}>
+        <MyApp />
+    </Provider>
+    , document.getElementById('root')
+);
+
+
+
+////////////
+// helper //
+////////////
+function getFilteredCollection(collection, visibilityFilter) {
+    switch (visibilityFilter) {
+        case 'showAll':
+            return collection;
+        case 'showTrue':
+            return collection.filter(i=>i.isTrue);
+        case 'showFalse' :
+            return collection.filter(i=>!i.isTrue);
+    };
+};
+</script>
+</body>
+
+</html>
