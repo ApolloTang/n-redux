@@ -1,0 +1,59 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>04-01-use-patch-to-chain-w-next</title>
+</head>
+<body>
+
+<script src="http://localhost:8001/js/lib/lodash-v3.10.1.js"></script>
+<script>
+</script>
+
+
+<script src="http://localhost:8001/js/lib/babel-transform-in-browser@6.4.6.min.js"></script>
+<script type="text/es2015">
+
+
+var dispatch = (action) => {
+    const dispatchResult = '[0]';
+    console.log(`dipatching: ${dispatchResult}`);
+    return dispatchResult;
+};
+
+
+let patch1 = (_dispatch) => {
+    const next = _dispatch;
+    _dispatch = (action)=>{
+        const dispatch_then_log = (action) => {
+            const dispatchResult = next(action) + '[1]';
+            (function (action){ console.log(`log > ${action} has dispatched`); })(action)
+            return dispatchResult;
+        }
+        return dispatch_then_log(action);
+    };
+    return _dispatch;
+}
+
+let patch2 = (_dispatch) => {
+    const next = _dispatch;
+    _dispatch = (action)=>{
+        const dispatch_then_save = (action) => {
+            const dispatchResult = next(action) + '[2]';
+            (function (action){ console.log(`saved > ${action} has been saved`); })(action)
+            return dispatchResult;
+        }
+        return dispatch_then_save(action);
+    };
+    return _dispatch
+}
+
+dispatch = patch2(patch1(dispatch));
+
+const dispatchResult_final = dispatch('action-1');
+
+console.log('final: ', dispatchResult_final)
+
+</script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>01-original-dispatch</title>
+</head>
+<body>
+
+<script src="http://localhost:8001/js/lib/lodash-v3.10.1.js"></script>
+<script>
+</script>
+
+
+<script src="http://localhost:8001/js/lib/babel-transform-in-browser@6.4.6.min.js"></script>
+<script type="text/es2015">
+
+let dispatch = (action) => {
+    const dispatchResult = '[0]';
+    console.log(`dipatching: ${dispatchResult}`);
+    return dispatchResult;
+};
+
+let next1 = dispatch;
+const dispatch1 = (action)=>{
+    const dispatch_then_log = (action) => {
+        const dispatchResult = next1(action) + '[1]';
+        (function (action){ console.log(`log > ${action} has dispatched`); })(action)
+        return dispatchResult;
+    }
+    return dispatch_then_log(action);
+};
+
+let next2 = dispatch1;
+const dispatch2 = (action)=>{
+    const dispatch_then_save = (action) => {
+        const dispatchResult = next2(action) + '[3]';
+        (function (action){ console.log(`saved > ${action} has been saved`); })(action)
+        return dispatchResult;
+    }
+    return dispatch_then_save(action);
+};
+
+const dispatchResult_final = dispatch2('action-1');
+console.log('final: ', dispatchResult_final)
+
+</script>
+</body>
+</html>

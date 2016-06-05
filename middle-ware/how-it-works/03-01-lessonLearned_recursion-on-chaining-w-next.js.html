@@ -1,0 +1,36 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>01-original-dispatch</title>
+</head>
+<body>
+
+<script src="http://localhost:8001/js/lib/lodash-v3.10.1.js"></script>
+
+<script>
+
+var f1 = function(){
+    //1
+}
+
+var n1 = f1;
+var f2 = function(){
+    console.log('----- 2', n1); // when f3 is execute n change from f1 to f2, thus recursion occur
+    n1();
+};
+
+var n2 = f2;
+var f3 = function(){
+    console.log('----- 3', n2);
+    n2();
+};
+
+f3();
+
+
+</script>
+
+
+</body>
+</html>
